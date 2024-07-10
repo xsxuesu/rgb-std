@@ -1,0 +1,42 @@
+name: Lints
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+      - 'v[0-9]+.[0-9]+'
+  pull_request:
+    branches:
+      - master
+      - develop
+      - 'v[0-9]+.[0-9]+'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Nix
+        uses: cachix/install-nix-action@v26
+      - name: Formatting
+        run: nix develop .#nightly -c cargo fmt --all -- --check
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Nix
+        uses: cachix/install-nix-action@v26
+      - name: Clippy
+        run: nix develop .#stable -c cargo clippy --workspace --all-features --all-targets -- -D warnings
+  doc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Nix
+        uses: cachix/install-nix-action@v26
+      - name: Doc
+        run: nix develop .#nightly -c cargo doc --workspace --all-features
